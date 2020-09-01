@@ -53,24 +53,25 @@ func (c *client) Price() {
 	fmt.Println(string(body))
 }
 
-func (c *client) Buy() {
+func (c *client) Buy(crq *models.ChannelRequest) *models.ChannelResponse {
 	client := &http.Client{}
-	param := &models.BuyParam{}
+	param := models.ConvertReq(crq).(*models.BuyParam)
 	bytesData, _ := json.Marshal(param)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s/api/v1/order/buy", beego.AppConfig.String("4usdt")), bytes.NewReader(bytesData))
 	resp, _ := client.Do(req)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	json.Unmarshal()
+	return parseResponse(body)
 }
 
-func (c *client) Sell() {
+func (c *client) Sell(crq *models.ChannelRequest) *models.ChannelResponse{
 	client := &http.Client{}
-	param := &models.SellParam{}
+	param := models.ConvertReq(crq).(*models.SellParam)
 	bytesData, _ := json.Marshal(param)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s/api/v1/order/sell", beego.AppConfig.String("4usdt")), bytes.NewReader(bytesData))
 	resp, _ := client.Do(req)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	return parseResponse(body)
 }
 
 func (c *client) Order() {
@@ -133,14 +134,14 @@ func (c *client) Balance() {
 	fmt.Println(string(body))
 }
 
-func (c *client) Withdraw() {
+func (c *client) Withdraw(crq *models.ChannelRequest) *models.ChannelResponse {
 	client := &http.Client{}
-	param := &models.WithdrawParam{}
+	param := models.ConvertReq(crq).(*models.WithdrawParam)
 	bytesData, _ := json.Marshal(param)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s/api/v1/account/withdraw", beego.AppConfig.String("4usdt")), bytes.NewReader(bytesData))
 	resp, _ := client.Do(req)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	return parseResponse(body)
 }
 
 func (c *client) WithdrawInfo() {
@@ -161,4 +162,12 @@ func (c *client) WithdrawInfo() {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(body))
+}
+
+func parseResponse(resp []byte) *models.ChannelResponse{
+	var crsp *models.ChannelResponse
+	if err := json.Unmarshal([]byte(string(resp)), crsp); err == nil{
+		return crsp
+	}
+	return nil
 }
