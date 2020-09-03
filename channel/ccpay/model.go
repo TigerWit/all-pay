@@ -1,4 +1,4 @@
-package models
+package ccpay
 
 type CCNotifyParam struct {
 	TradeType      string `json:"tradeType"`
@@ -28,4 +28,9 @@ type CCAckParam struct {
 	MerchantWithdrawNo string `json:"merchant_withdraw_no"`
 	OrderNo            string `json:"order_no"`
 	Side               string `json:"side"`
+}
+
+type CCReply struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
 }

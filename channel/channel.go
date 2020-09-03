@@ -1,6 +1,12 @@
-package models
+package channel
 
-import "encoding/json"
+type MetaData struct {
+	ClientId    string
+	RedirectUrl string
+	CallbackUrl string
+	Sign        string
+	SignVersion string
+}
 
 type OrderType int
 
@@ -40,42 +46,15 @@ type ChannelRequest struct {
 	MerchantWithdrawNo string  `json:"merchant_withdraw_no"`
 }
 
-func ConvertReq(req *ChannelRequest) interface{} {
-	switch req.Type {
-	case int(Buy):
-		return cvtBuy(req)
-	case int(Sell):
-		return cvtSell(req)
-	case int(Settlement):
-		return cvtWithdraw(req)
-	}
-	return nil
-}
-
-func cvtBuy(req *ChannelRequest) *BuyParam {
-	reqj, _ := json.Marshal(req)
-	buyParam := new(BuyParam)
-	_ = json.Unmarshal(reqj, buyParam)
-	return buyParam
-}
-
-func cvtSell(req *ChannelRequest) *SellParam {
-	reqj, _ := json.Marshal(req)
-	sellParam := new(SellParam)
-	_ = json.Unmarshal(reqj, sellParam)
-	return sellParam
-}
-
-func cvtWithdraw(req *ChannelRequest) *WithdrawParam {
-	reqj, _ := json.Marshal(req)
-	withdrawParam := new(WithdrawParam)
-	_ = json.Unmarshal(reqj, withdrawParam)
-	return withdrawParam
-}
-
 type ChannelResponse struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
 	Meta interface{} `json:"meta"`
+}
+
+type ChannelNotifyInfo struct {
+}
+
+type ChannelAckInfo struct {
 }

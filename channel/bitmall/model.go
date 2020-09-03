@@ -1,4 +1,9 @@
-package models
+package bitmall
+
+import (
+	"all-pay/channel"
+	"encoding/json"
+)
 
 type BuyParam struct {
 	Currency        string  `json:"currency"`
@@ -87,4 +92,44 @@ type AckParam struct {
 	Timestamp          string  `json:"timestamp"`
 	SignVersion        string  `json:"sign_version"`
 	Sign               string  `json:"sign"`
+}
+
+type BitMallReply struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
+	Meta interface{} `json:"meta"`
+}
+
+func convertReq(req *channel.ChannelRequest) interface{} {
+	switch req.Type {
+	case int(channel.Buy):
+		return cvtBuy(req)
+	case int(channel.Sell):
+		return cvtSell(req)
+	case int(channel.Settlement):
+		return cvtWithdraw(req)
+	}
+	return nil
+}
+
+func cvtBuy(req *channel.ChannelRequest) *BuyParam {
+	reqj, _ := json.Marshal(req)
+	buyParam := new(BuyParam)
+	_ = json.Unmarshal(reqj, buyParam)
+	return buyParam
+}
+
+func cvtSell(req *channel.ChannelRequest) *SellParam {
+	reqj, _ := json.Marshal(req)
+	sellParam := new(SellParam)
+	_ = json.Unmarshal(reqj, sellParam)
+	return sellParam
+}
+
+func cvtWithdraw(req *channel.ChannelRequest) *WithdrawParam {
+	reqj, _ := json.Marshal(req)
+	withdrawParam := new(WithdrawParam)
+	_ = json.Unmarshal(reqj, withdrawParam)
+	return withdrawParam
 }

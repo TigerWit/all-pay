@@ -1,7 +1,7 @@
 package bitmall
 
 import (
-	"all-pay/models"
+	"all-pay/channel"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -12,14 +12,12 @@ import (
 )
 
 type client struct {
-	RedirectUrl string
-	CallbackUrl string
+	*channel.MetaData
 }
 
-func NewClient() *client {
+func NewClient(md *channel.MetaData) *client {
 	return &client{
-		RedirectUrl: "https://xxx.com/redirect.html?channel=4usdt",
-		CallbackUrl: "https://xxx.com/callback?channel=4usdt",
+		md,
 	}
 }
 
@@ -59,9 +57,9 @@ func (c *client) Price() {
 	fmt.Println(string(body))
 }
 
-func (c *client) Buy(crq *models.ChannelRequest) *models.ChannelResponse {
+func (c *client) Buy(crq *channel.ChannelRequest) *channel.ChannelResponse {
 	client := &http.Client{}
-	param := models.ConvertReq(crq).(*models.BuyParam)
+	param := convertReq(crq).(*BuyParam)
 	param.RedirectUrl = c.RedirectUrl
 	param.CallbackUrl = c.CallbackUrl
 	bytesData, _ := json.Marshal(param)
@@ -71,9 +69,9 @@ func (c *client) Buy(crq *models.ChannelRequest) *models.ChannelResponse {
 	return parseResponse(body)
 }
 
-func (c *client) Sell(crq *models.ChannelRequest) *models.ChannelResponse {
+func (c *client) Sell(crq *channel.ChannelRequest) *channel.ChannelResponse {
 	client := &http.Client{}
-	param := models.ConvertReq(crq).(*models.SellParam)
+	param := convertReq(crq).(*SellParam)
 	param.RedirectUrl = c.RedirectUrl
 	param.CallbackUrl = c.CallbackUrl
 	bytesData, _ := json.Marshal(param)
@@ -143,9 +141,9 @@ func (c *client) Balance() {
 	fmt.Println(string(body))
 }
 
-func (c *client) Withdraw(crq *models.ChannelRequest) *models.ChannelResponse {
+func (c *client) Withdraw(crq *channel.ChannelRequest) *channel.ChannelResponse {
 	client := &http.Client{}
-	param := models.ConvertReq(crq).(*models.WithdrawParam)
+	param := convertReq(crq).(*WithdrawParam)
 	bytesData, _ := json.Marshal(param)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s/api/v1/account/withdraw", beego.AppConfig.String("4usdt")), bytes.NewReader(bytesData))
 	resp, _ := client.Do(req)
@@ -173,26 +171,34 @@ func (c *client) WithdrawInfo() {
 	fmt.Println(string(body))
 }
 
-func (c *client) CallBack(input []byte) (*models.NotifyParam, error) {
-	var param *models.NotifyParam
+func (c *client) CallBack(input []byte) (*channel.ChannelNotifyInfo, error) {
+	var param *NotifyParam
 	var err error
 	if err = json.Unmarshal(input, param); err == nil {
-		return param, nil
+		return wrapNotifyInfo(param), nil
 	}
 	return nil, err
 }
 
-func (c *client) Ack(input []byte) (*models.AckParam, error) {
-	var param *models.AckParam
+func wrapNotifyInfo(param *NotifyParam) *channel.ChannelNotifyInfo {
+	return &channel.ChannelNotifyInfo{}
+}
+
+func (c *client) Ack(input []byte) (*channel.ChannelAckInfo, error) {
+	var param *AckParam
 	var err error
 	if err = json.Unmarshal(input, param); err == nil {
-		return param, nil
+		return wrapAckInfo(param), nil
 	}
 	return nil, err
 }
 
-func (c *client) ProcessSuccess() *models.BitMallReply {
-	return &models.BitMallReply{
+func wrapAckInfo(param *AckParam) *channel.ChannelAckInfo {
+	return &channel.ChannelAckInfo{}
+}
+
+func (c *client) ProcessSuccess() interface{} {
+	return &BitMallReply{
 		0,
 		"SUCCESS",
 		nil,
@@ -200,8 +206,8 @@ func (c *client) ProcessSuccess() *models.BitMallReply {
 	}
 }
 
-func parseResponse(resp []byte) *models.ChannelResponse {
-	var crsp *models.ChannelResponse
+func parseResponse(resp []byte) *channel.ChannelResponse {
+	var crsp *channel.ChannelResponse
 	if err := json.Unmarshal([]byte(string(resp)), crsp); err == nil {
 		return crsp
 	}

@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"all-pay/channel"
 	"all-pay/channel/bitmall"
-	"all-pay/models"
+	"all-pay/channel/ccpay"
+	"fmt"
 )
 
 type chClient interface {
@@ -20,8 +22,8 @@ type common interface {
 //交易相关接口
 type deal interface {
 	Price()
-	Buy(*models.ChannelRequest) *models.ChannelResponse
-	Sell(*models.ChannelRequest) *models.ChannelResponse
+	Buy(*channel.ChannelRequest) *channel.ChannelResponse
+	Sell(*channel.ChannelRequest) *channel.ChannelResponse
 	Order()
 	UserOrder()
 }
@@ -29,23 +31,27 @@ type deal interface {
 //账户相关接口
 type account interface {
 	Balance()
-	Withdraw(*models.ChannelRequest) *models.ChannelResponse
+	Withdraw(*channel.ChannelRequest) *channel.ChannelResponse
 	WithdrawInfo()
 }
 
 //订单结果通知回调&确认提现
 type confirm interface {
-	CallBack([]byte) (*models.NotifyParam, error)
-	Ack([]byte) (*models.AckParam, error)
+	CallBack([]byte) (*channel.ChannelNotifyInfo, error)
+	Ack([]byte) (*channel.ChannelAckInfo, error)
 	ProcessSuccess() interface{}
 }
 
 var Client chClient
 
-func init() {
-	Client = newChClient()
-}
-
-func newChClient() chClient {
-	return bitmall.NewClient()
+func NewChClient(channelID string, meta *channel.MetaData) chClient {
+	switch channelID {
+	case "4usdt":
+		return bitmall.NewClient(meta)
+	case "ccpay":
+		return ccpay.NewClient(meta)
+	default:
+		fmt.Println("un support channel!")
+		return nil
+	}
 }
