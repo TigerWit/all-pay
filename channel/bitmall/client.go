@@ -11,10 +11,16 @@ import (
 	"net/url"
 )
 
-type client struct{}
+type client struct {
+	RedirectUrl string
+	CallbackUrl string
+}
 
 func NewClient() *client {
-	return &client{}
+	return &client{
+		RedirectUrl: "https://xxx.com/redirect.html?channel=4usdt",
+		CallbackUrl: "https://xxx.com/callback?channel=4usdt",
+	}
 }
 
 func (c *client) Timestamp() {
@@ -56,17 +62,20 @@ func (c *client) Price() {
 func (c *client) Buy(crq *models.ChannelRequest) *models.ChannelResponse {
 	client := &http.Client{}
 	param := models.ConvertReq(crq).(*models.BuyParam)
+	param.RedirectUrl = c.RedirectUrl
+	param.CallbackUrl = c.CallbackUrl
 	bytesData, _ := json.Marshal(param)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s/api/v1/order/buy", beego.AppConfig.String("4usdt")), bytes.NewReader(bytesData))
 	resp, _ := client.Do(req)
 	body, _ := ioutil.ReadAll(resp.Body)
-	json.Unmarshal()
 	return parseResponse(body)
 }
 
-func (c *client) Sell(crq *models.ChannelRequest) *models.ChannelResponse{
+func (c *client) Sell(crq *models.ChannelRequest) *models.ChannelResponse {
 	client := &http.Client{}
 	param := models.ConvertReq(crq).(*models.SellParam)
+	param.RedirectUrl = c.RedirectUrl
+	param.CallbackUrl = c.CallbackUrl
 	bytesData, _ := json.Marshal(param)
 	req, _ := http.NewRequest("POST", fmt.Sprintf("https://%s/api/v1/order/sell", beego.AppConfig.String("4usdt")), bytes.NewReader(bytesData))
 	resp, _ := client.Do(req)
@@ -164,9 +173,36 @@ func (c *client) WithdrawInfo() {
 	fmt.Println(string(body))
 }
 
-func parseResponse(resp []byte) *models.ChannelResponse{
+func (c *client) CallBack(input []byte) (*models.NotifyParam, error) {
+	var param *models.NotifyParam
+	var err error
+	if err = json.Unmarshal(input, param); err == nil {
+		return param, nil
+	}
+	return nil, err
+}
+
+func (c *client) Ack(input []byte) (*models.AckParam, error) {
+	var param *models.AckParam
+	var err error
+	if err = json.Unmarshal(input, param); err == nil {
+		return param, nil
+	}
+	return nil, err
+}
+
+func (c *client) ProcessSuccess() *models.BitMallReply {
+	return &models.BitMallReply{
+		0,
+		"SUCCESS",
+		nil,
+		nil,
+	}
+}
+
+func parseResponse(resp []byte) *models.ChannelResponse {
 	var crsp *models.ChannelResponse
-	if err := json.Unmarshal([]byte(string(resp)), crsp); err == nil{
+	if err := json.Unmarshal([]byte(string(resp)), crsp); err == nil {
 		return crsp
 	}
 	return nil
