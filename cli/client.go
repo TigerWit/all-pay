@@ -1,10 +1,10 @@
 package cli
 
 import (
-	"all-pay/channel"
-	"all-pay/channel/bitmall"
-	"all-pay/channel/ccpay"
 	"fmt"
+	"github.com/TigerWit/all-pay/channel"
+	"github.com/TigerWit/all-pay/channel/bitmall"
+	"github.com/TigerWit/all-pay/channel/ccpay"
 )
 
 type chClient interface {

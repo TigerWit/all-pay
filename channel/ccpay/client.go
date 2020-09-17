@@ -1,7 +1,7 @@
 package ccpay
 
 import (
-	"all-pay/channel"
+	"github.com/TigerWit/all-pay/channel"
 )
 
 type client struct {

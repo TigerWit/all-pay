@@ -1,8 +1,8 @@
 package bitmall
 
 import (
-	"all-pay/channel"
 	"encoding/json"
+	"github.com/TigerWit/all-pay/channel"
 )
 
 type BuyParam struct {

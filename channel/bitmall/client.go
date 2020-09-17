@@ -1,10 +1,10 @@
 package bitmall
 
 import (
-	"all-pay/channel"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/TigerWit/all-pay/channel"
 	"github.com/astaxie/beego"
 	"io/ioutil"
 	"net/http"
