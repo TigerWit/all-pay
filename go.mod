@@ -1,4 +1,4 @@
-module all-pay
+module github.com/TigerWit/all-pay
 
 go 1.13
 
