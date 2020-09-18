@@ -7,7 +7,7 @@ import (
 	"github.com/TigerWit/all-pay/channel/ccpay"
 )
 
-type chClient interface {
+type ChannelClient interface {
 	common
 	deal
 	account
@@ -42,9 +42,7 @@ type confirm interface {
 	ProcessSuccess() interface{}
 }
 
-var Client chClient
-
-func NewChClient(channelID string, meta *channel.MetaData) chClient {
+func NewChClient(channelID string, meta *channel.MetaData) ChannelClient {
 	switch channelID {
 	case "4usdt":
 		return bitmall.NewClient(meta)
