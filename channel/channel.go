@@ -17,6 +17,7 @@ const (
 )
 
 type ChannelRequest struct {
+	ChannelID          int     `json:channel_id`
 	Type               int     `json:"type"`
 	Currency           string  `json:"currency"`
 	Count              float64 `json:"count"`
