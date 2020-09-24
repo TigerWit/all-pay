@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type client struct {
@@ -81,45 +82,45 @@ func (c *client) Sell(crq *channel.ChannelRequest) *channel.ChannelResponse {
 	return parseResponse(body)
 }
 
-func (c *client) Order() {
+func (c *client) Order(merchantOrderNo string) *channel.ChannelResponse {
 	params := url.Values{}
 	Url, err := url.Parse(fmt.Sprintf("https://%s/api/v1/order", beego.AppConfig.String("4usdt")))
 	if err != nil {
-		return
+		return nil
 	}
-	params.Set("merchant_order_no", "")
-	params.Set("client_id", "")
-	params.Set("timestamp", "")
-	params.Set("sign", "")
-	params.Set("sign_version", "")
+	params.Set("merchant_order_no", merchantOrderNo)
+	params.Set("client_id", c.ClientId)
+	params.Set("timestamp", time.Now().String())
+	params.Set("sign", c.Sign)
+	params.Set("sign_version", c.SignVersion)
 	Url.RawQuery = params.Encode()
 	urlPath := Url.String()
 	fmt.Println(urlPath)
 	resp, err := http.Get(urlPath)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	return parseResponse(body)
 }
 
-func (c *client) UserOrder() {
+func (c *client) UserOrder(mobile string) *channel.ChannelResponse {
 	params := url.Values{}
 	Url, err := url.Parse(fmt.Sprintf("https://%s/api/v1/user/order", beego.AppConfig.String("4usdt")))
 	if err != nil {
-		return
+		return nil
 	}
 	params.Set("area_code", "")
-	params.Set("mobile", "")
-	params.Set("client_id", "")
-	params.Set("timestamp", "")
-	params.Set("sign", "")
-	params.Set("sign_version", "")
+	params.Set("mobile", mobile)
+	params.Set("client_id", c.ClientId)
+	params.Set("timestamp", time.Now().String())
+	params.Set("sign", c.Sign)
+	params.Set("sign_version", c.SignVersion)
 	Url.RawQuery = params.Encode()
 	urlPath := Url.String()
 	fmt.Println(urlPath)
 	resp, err := http.Get(urlPath)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
+	return parseResponse(body)
 }
 
 func (c *client) Balance() {
