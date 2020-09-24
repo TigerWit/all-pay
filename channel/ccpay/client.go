@@ -34,9 +34,13 @@ func (c *client) Withdraw(*channel.ChannelRequest) *channel.ChannelResponse {
 
 func (c *client) WithdrawInfo() {}
 
-func (c *client) Order() {}
+func (c *client) Order(merchantOrderNo string) *channel.ChannelResponse{
+	return nil
+}
 
-func (c *client) UserOrder() {}
+func (c *client) UserOrder(mobile string) *channel.ChannelResponse{
+	return nil
+}
 
 func (c *client) CallBack([]byte) (*channel.ChannelNotifyInfo, error) {
 	return nil, nil

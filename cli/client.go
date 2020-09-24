@@ -24,8 +24,8 @@ type deal interface {
 	Price()
 	Buy(*channel.ChannelRequest) *channel.ChannelResponse
 	Sell(*channel.ChannelRequest) *channel.ChannelResponse
-	Order()
-	UserOrder()
+	Order(merchantOrderNo string) *channel.ChannelResponse
+	UserOrder(mobile string)*channel.ChannelResponse
 }
 
 //账户相关接口
