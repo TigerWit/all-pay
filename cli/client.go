@@ -25,7 +25,7 @@ type deal interface {
 	Buy(*channel.ChannelRequest) *channel.ChannelResponse
 	Sell(*channel.ChannelRequest) *channel.ChannelResponse
 	Order(merchantOrderNo string) *channel.ChannelResponse
-	UserOrder(mobile string)*channel.ChannelResponse
+	UserOrder(mobile string) *channel.ChannelResponse
 }
 
 //账户相关接口

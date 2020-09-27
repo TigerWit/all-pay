@@ -34,11 +34,11 @@ func (c *client) Withdraw(*channel.ChannelRequest) *channel.ChannelResponse {
 
 func (c *client) WithdrawInfo() {}
 
-func (c *client) Order(merchantOrderNo string) *channel.ChannelResponse{
+func (c *client) Order(merchantOrderNo string) *channel.ChannelResponse {
 	return nil
 }
 
-func (c *client) UserOrder(mobile string) *channel.ChannelResponse{
+func (c *client) UserOrder(mobile string) *channel.ChannelResponse {
 	return nil
 }
 

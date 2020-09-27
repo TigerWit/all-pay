@@ -57,6 +57,7 @@ type ChannelResponse struct {
 type ChannelNotifyInfo struct {
 	MerchantOrderNo string `json:"merchant_order_no"`
 	OrderNo         string `json:"order_no"`
+	Count           int    `json:"count"`
 }
 
 type ChannelAckInfo struct {
