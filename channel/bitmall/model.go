@@ -103,11 +103,11 @@ type BitMallReply struct {
 
 func convertReq(req *channel.ChannelRequest) interface{} {
 	switch req.Type {
-	case int(channel.Buy):
+	case channel.Buy:
 		return cvtBuy(req)
-	case int(channel.Sell):
+	case channel.Sell:
 		return cvtSell(req)
-	case int(channel.Settlement):
+	case channel.Settlement:
 		return cvtWithdraw(req)
 	}
 	return nil
